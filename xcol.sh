@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 # Simple colorize for bash by means of sed
 #
 # Copyright 2008-2015 by Andreas Schamanek <andreas@schamanek.net>
@@ -74,10 +74,10 @@ function xcolorize()
       local dummy=${left//(}; groupcnt=$((leftlength-${#dummy}-escdgroups+2))
       # replace \/ with )( so below we get (left-re)(right-re)
       re="${re/\\\//)(}"
-      local sedrules="$sedrules;s$A($re)$A\1${(P)c1}\\$groupcnt$beep$normal${A}g"
+      local sedrules="$sedrules;s$A($re)$A\1${!c1}\\$groupcnt$beep$normal${A}g"
       sedrules="${sedrules}I"   # add case insensitive
     else
-      local sedrules="$sedrules;s$A($re)$A${(P)c1}\1$beep$normal${A}g"
+      local sedrules="$sedrules;s$A($re)$A${!c1}\1$beep$normal${A}g"
       sedrules="${sedrules}I"   # add case insensitive
     fi
     # limit parsing of arguments
@@ -125,12 +125,14 @@ function xcol()
   [ -t 0 ] && local STDIN=0 || local STDIN=1
 
   if [[ $STDIN == 0 ]]; then 
-    local FILE=$argv[$#];                         # last argument is the file name
-    argv[$#]=()                                   # remove last argument
+    local ARGVS=${@: 1 : $#-1 }                   # all arguments except last one
+    local FILE=${@: -1}                           # last argument is the file name
+  else
+    local ARGVS=$@;
   fi
 
   local IDX=1                                     # rotate colors in a cycle
-  for arg in $argv[@]; do
+  for arg in ${ARGVS[@]}; do
     local ARGS=( ${ARGS[@]} ${COLS[$IDX]} $arg )
     IDX=$(( IDX + 1 )) 
     [[ $IDX == ${#COLS[@]} ]] && IDX=1
