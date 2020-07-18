@@ -124,16 +124,16 @@ function xcol()
 
   [ -t 0 ] && local STDIN=0 || local STDIN=1
 
-  if [[ $STDIN == 0 ]]; then 
+  if [[ $STDIN == 0 ]]; then
     local FILE=$argv[$#];                         # last argument is the file name
     argv[$#]=()                                   # remove last argument
   fi
 
-  local IDX=1                                     # rotate colors in a cycle
+  local IDX=0                                     # rotate colors in a cycle
   for arg in $argv[@]; do
     local ARGS=( ${ARGS[@]} ${COLS[$IDX]} $arg )
-    IDX=$(( IDX + 1 )) 
-    [[ $IDX == ${#COLS[@]} ]] && IDX=1
+    IDX=$(( IDX + 1 ))
+    [[ $IDX == ${#COLS[@]} ]] && IDX=0
   done
   [[ $STDIN == 1 ]] && {
     xcolorize --unbuffered ${ARGS[@]}
